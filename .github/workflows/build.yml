@@ -1,0 +1,104 @@
+name: Build
+
+on: [push]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ${{matrix.platform.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+        - { os: windows-2022, config_preset: vs2022-amd64 }
+        - { os: ubuntu-22.04, config_preset: gcc-amd64 }
+        - { os: ubuntu-22.04, config_preset: clang-amd64 }
+        - { os: ubuntu-22.04, config_preset: emscripten-wasm32 }
+        - { os: macos-12,     config_preset: appleclang-amd64 }
+        build_type: [release, debug]
+
+    env:
+      SOURCE_DIR: ${{github.workspace}}
+      BUILD_DIR: ${{github.workspace}}/build/${{matrix.platform.config_preset}}
+      DEPLOY_DIR: ${{github.workspace}}/deploy/${{matrix.platform.config_preset}}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install ninja & cppcheck (Ubuntu)
+      run: sudo apt-get update && sudo apt-get install ninja-build cppcheck -y
+      if: matrix.platform.os == 'ubuntu-22.04'
+
+    - name: Install ninja & cppcheck (MacOS)
+      run: brew install ninja cppcheck
+      if: matrix.platform.os == 'macos-12'
+
+    - name: Setup emsdk
+      if: matrix.platform.config_preset == 'emscripten-wasm32'
+      run: |
+           tools/setup-emsdk.sh
+           echo 'source "$EMSDK/emsdk_env.sh"' >> /home/runner/.bash_profile
+
+    - name: Create Build Environment
+      # We'll use this as our working directory for subsequent commands.
+      run: cmake -E make_directory ${{env.BUILD_DIR}}
+
+    - name: Configure CMake
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system.
+      shell: bash
+      working-directory: ${{env.SOURCE_DIR}}
+      run: cmake --preset ${{matrix.platform.config_preset}}
+
+    - name: Build
+      working-directory: ${{env.SOURCE_DIR}}
+      shell: bash
+      # Execute the build.  You can specify a specific target with "--target <NAME>".
+      run: cmake --build --preset ${{matrix.platform.config_preset}}-${{matrix.build_type}}
+
+    - name: Test
+      working-directory: ${{env.BUILD_DIR}}
+      shell: bash
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{ matrix.build_type }}
+
+    - name: Package
+      working-directory: ${{env.SOURCE_DIR}}
+      shell: bash
+      # Build the package target.
+      run: cmake --build --preset ${{matrix.platform.config_preset}}-${{matrix.build_type}} --target package
+
+    - name: Upload package artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{matrix.platform.config_preset}}-${{matrix.build_type}}
+        path: ${{env.BUILD_DIR}}/*-*.*.*-* # TODO: Something better
+
+    - name: Repackage WASM package contents for GitHub Pages
+      if: matrix.platform.config_preset == 'emscripten-wasm32' && matrix.build_type == 'release'
+      shell: bash
+      run: |
+           mkdir -p ${{env.DEPLOY_DIR}}
+           cd ${{env.DEPLOY_DIR}}
+           tar -xzvf ${{env.BUILD_DIR}}/*-*.*.*-*.tar.gz
+           echo "PACKAGE_NAME=`ls`" >> $GITHUB_ENV
+    - name: Setup Pages
+      if: matrix.platform.config_preset == 'emscripten-wasm32' && matrix.build_type == 'release'
+      uses: actions/configure-pages@v3
+    - name: Upload artifact
+      if: matrix.platform.config_preset == 'emscripten-wasm32' && matrix.build_type == 'release'
+      uses: actions/upload-pages-artifact@v1
+      with:
+        # Upload DEPLOY_DIR folder
+        path: ${{env.DEPLOY_DIR}}/${{env.PACKAGE_NAME}}/bin/
+
+    - name: Deploy to GitHub Pages
+      if: matrix.platform.config_preset == 'emscripten-wasm32' && matrix.build_type == 'release'
+      id: deployment
+      uses: actions/deploy-pages@v1

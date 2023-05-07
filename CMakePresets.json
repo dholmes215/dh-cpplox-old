@@ -1,0 +1,123 @@
+{
+    "version": 2,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 20,
+        "patch": 3
+    },
+    "configurePresets": [
+        {
+            "name": "user-default",
+            "hidden": true,
+            "displayName": "Base for other presets to inherit",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "description": "Default build using Ninja Multi-Config generator",
+            "generator": "Ninja Multi-Config",
+            "cacheVariables": {
+                "BUILD_TESTING": "ON",
+                "PROJECT_USE_VCPKG": "ON",
+                "PROJECT_GIT_SUBMODULE": "ON",
+                "PROJECT_WARNINGS_AS_ERRORS": "ON",
+                "PROJECT_ENABLE_CPPCHECK": "ON",
+                "PROJECT_ENABLE_CLANG_TIDY": "ON",
+                "PROJECT_ENABLE_INCLUDE_WHAT_YOU_USE": "OFF"
+            }
+        },
+        {
+            "name": "clang-amd64",
+            "inherits": "user-default",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++"
+            }
+        },
+        {
+            "name": "appleclang-amd64",
+            "inherits": "clang-amd64",
+            "cacheVariables": {
+                "PROJECT_ENABLE_CLANG_TIDY": "OFF"
+            }
+        },
+        {
+            "name": "gcc-amd64",
+            "inherits": "user-default",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        },
+        {
+            "name": "vs2022-amd64",
+            "inherits": "user-default",
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64",
+            "cacheVariables": {
+                "PROJECT_ENABLE_CPPCHECK": "OFF",
+                "PROJECT_ENABLE_CLANG_TIDY": "OFF",
+                "PROJECT_ENABLE_INCLUDE_WHAT_YOU_USE": "OFF"
+            }
+        },
+        {
+            "name": "emscripten-wasm32",
+            "inherits": "user-default",
+            "cacheVariables": {
+                "BUILD_TESTING": "OFF",
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/tools/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
+                "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake/vcpkg-triplets",
+                "VCPKG_TARGET_TRIPLET": "wasm32-emscripten-local"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "clang-amd64-debug",
+            "configurePreset": "clang-amd64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "clang-amd64-release",
+            "configurePreset": "clang-amd64",
+            "configuration": "Release"
+        },
+        {
+            "name": "appleclang-amd64-debug",
+            "configurePreset": "appleclang-amd64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "appleclang-amd64-release",
+            "configurePreset": "appleclang-amd64",
+            "configuration": "Release"
+        },
+        {
+            "name": "gcc-amd64-debug",
+            "configurePreset": "gcc-amd64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "gcc-amd64-release",
+            "configurePreset": "gcc-amd64",
+            "configuration": "Release"
+        },
+        {
+            "name": "vs2022-amd64-debug",
+            "configurePreset": "vs2022-amd64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "vs2022-amd64-release",
+            "configurePreset": "vs2022-amd64",
+            "configuration": "Release"
+        },
+        {
+            "name": "emscripten-wasm32-debug",
+            "configurePreset": "emscripten-wasm32",
+            "configuration": "Debug"
+        },
+        {
+            "name": "emscripten-wasm32-release",
+            "configurePreset": "emscripten-wasm32",
+            "configuration": "Release"
+        }
+    ]
+}

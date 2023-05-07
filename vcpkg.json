@@ -1,0 +1,11 @@
+{
+    "name": "hello",
+    "version-string": "0.0.1",
+    "dependencies": [
+        {
+            "name": "catch2",
+            "platform": "!wasm32"
+        },
+        "fmt"
+    ]
+}
