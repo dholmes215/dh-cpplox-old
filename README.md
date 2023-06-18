@@ -1,10 +1,10 @@
-# C++ Template
-A demonstration of how to configure a modern C++ project properly.
+dh-cpplox
+David's implementation of clox from Crafting Interpreters, in C++20
 
 ## Requirements
 
 * **A C++20 compiler**
-* **CMake 3.20.3 or later**
+* **CMake 3.26.3 or later**
 
 ## Building
 
@@ -24,12 +24,8 @@ cmake --build [output_dir]
 
 ## Running
 
-Run `hello` (on Windows `hello.exe`) with no arguments:
-```
-> hello.exe
-Hello World!
-```
+TODO
 
-## License
+## License & Copyright
 
-This project is in the public domain (see `LICENSE`).
+This project is a derivative work based on Robert Nystrom's `clox`, the code of which is licensed under the MIT license, as is this project.

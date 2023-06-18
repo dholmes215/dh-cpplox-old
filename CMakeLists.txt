@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21.0)
+cmake_minimum_required(VERSION 3.26.3)
 
 option(PROJECT_USE_VCPKG "Use vcpkg for library dependencies" ON)
 option(PROJECT_GIT_SUBMODULE "Update submodules during build" OFF)
@@ -14,10 +14,10 @@ endif()
 set(CMAKE_SYSTEM_PROCESSOR x86)
 
 project(
-  hello
+  dh-cpplox
   VERSION 0.0.1
-  DESCRIPTION "Application to print \"Hello World!\""
-  HOMEPAGE_URL https://github.com/dholmes215/cpp-template-2
+  DESCRIPTION "David's implementation of clox from Crafting Interpreters, in C++20"
+  HOMEPAGE_URL https://github.com/dholmes215/dh-cpplox
   LANGUAGES CXX)
 
 # Find dependencies.
@@ -25,6 +25,7 @@ if(BUILD_TESTING)
   find_package(Catch2 REQUIRED)
 endif()
 find_package(fmt REQUIRED)
+find_package(Microsoft.GSL REQUIRED)
 
 # Targets can "link" this "library" to inherit project options.
 add_library(project_options INTERFACE)
@@ -48,10 +49,10 @@ endif()
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
-  set(CPACK_PACKAGE_NAME MyProj)
-  set(CPACK_PACKAGE_VENDOR MyCompany)
-  set(CPACK_PACKAGE_CONTACT "John Doe")
-  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CPack example project")
+  set(CPACK_PACKAGE_NAME dh-cpplox)
+  set(CPACK_PACKAGE_VENDOR "David Holmes")
+  set(CPACK_PACKAGE_CONTACT "David Holmes")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "David's implementation of clox from Crafting Interpreters, in C++20")
   set(CPACK_PACKAGE_INSTALL_DIRECTORY ${CPACK_PACKAGE_NAME})
   set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
   set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
