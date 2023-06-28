@@ -158,6 +158,11 @@ class malloc_dynarray {
     // TODO: Enforce that T is an implicit-lifetime type.  This is not presently
     // possible in C++20 but there are proposals to make it possible in C++23.
    public:
+    using pointer = T*;
+    using const_pointer = const T*;
+    using iterator = T*;
+    using const_iterator = const T*;
+
     void push_back(T value)
     {
         if (capacity_ < count_ + 1) {
@@ -171,6 +176,13 @@ class malloc_dynarray {
     }
     T at(int idx) const noexcept { return data_[idx]; }
     int size() const noexcept { return count_; }
+
+    iterator begin() { return data_.get(); }
+    iterator end() { return data_.get() + size(); }
+    const_iterator begin() const { return data_.get(); }
+    const_iterator end() const { return data_.get() + size(); }
+    const_iterator cbegin() const { return data_.get(); }
+    const_iterator cend() const { return data_.get() + size(); }
 
    private:
     int count_{0};

@@ -12,8 +12,17 @@
 
 namespace lox {
 
-struct VM {
-    Chunk* chunk{nullptr};
+enum class InterpretResult { ok, compile_error, runtime_error };
+
+class VM {
+    using InstructionPointer = ByteArray::const_iterator;
+
+   public:
+    InterpretResult interpret(Chunk* chunk);
+
+   private:
+    Chunk* chunk_{nullptr};
+    InstructionPointer ip_{};
 };
 
 }  // namespace lox

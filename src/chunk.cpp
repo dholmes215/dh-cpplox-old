@@ -12,7 +12,7 @@ namespace lox {
 
 void Chunk::write(std::uint8_t byte, int line)
 {
-    bytes_.push_back(byte);
+    code_.push_back(byte);
     lines_.push_back(line);
 }
 

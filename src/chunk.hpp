@@ -21,19 +21,33 @@ enum class Op : std::uint8_t {
     return_,
 };
 
+/**
+ * @brief Convert enumeration to its underlying type.
+ * TODO: In C++23, replace this with std::to_underlying.
+ *
+ * @param enum_value An enumeration value.
+ * @return The integer value of the underlying type of the enum, converted from
+ * enum_value.
+ */
+auto to_underlying(auto enum_value)
+{
+    using Enum = decltype(enum_value);
+    return static_cast<std::underlying_type_t<Enum>>(enum_value);
+}
+
 using ByteArray = malloc_dynarray<std::uint8_t>;
 using LineArray = malloc_dynarray<int>;
 
 class Chunk {
    public:
-    const ByteArray& bytes() const { return bytes_; }
+    const ByteArray& code() const { return code_; }
     const LineArray& lines() const { return lines_; }
     const ValueArray& constants() const { return constants_; }
     void write(std::uint8_t byte, int line);
     int addConstant(Value value);
 
    private:
-    ByteArray bytes_;
+    ByteArray code_;
     LineArray lines_;
     ValueArray constants_;
 };

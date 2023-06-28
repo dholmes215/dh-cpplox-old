@@ -17,7 +17,7 @@ void disassembleChunk(Chunk& chunk, const char* name)
 {
     fmt::print("== {} ==\n", name);
 
-    for (int offset{0}; offset < chunk.bytes().size();) {
+    for (int offset{0}; offset < chunk.code().size();) {
         // TODO: Not this
         offset = disassembleInstruction(chunk, offset);
     }
@@ -27,7 +27,7 @@ namespace {
 
 int constantInstruction(const char* name, const Chunk& chunk, int offset)
 {
-    std::uint8_t constant{chunk.bytes().at(offset + 1)};
+    std::uint8_t constant{chunk.code().at(offset + 1)};
     fmt::print("{:16} {:4} '", name, constant);
     printValue(chunk.constants().at(constant));
     fmt::print("'\n");
@@ -53,7 +53,7 @@ int disassembleInstruction(Chunk& chunk, int offset)
         fmt::print("{:04} ", chunk.lines().at(offset));
     }
 
-    Op instruction{static_cast<Op>(chunk.bytes().at(offset))};
+    Op instruction{static_cast<Op>(chunk.code().at(offset))};
     switch (instruction) {
         case Op::constant:
             return constantInstruction("OP_CONSTANT", chunk, offset);

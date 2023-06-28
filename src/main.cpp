@@ -7,24 +7,13 @@
 
 #include "chunk.hpp"
 #include "debug.hpp"
+#include "vm.hpp"
 
 #include <gsl/narrow>
 
 namespace lox {
 
-/**
- * @brief Convert enumeration to its underlying type.
- * TODO: In C++23, replace this with std::to_underlying.
- *
- * @param enum_value An enumeration value.
- * @return The integer value of the underlying type of the enum, converted from
- * enum_value.
- */
-auto to_underlying(auto enum_value)
-{
-    using Enum = decltype(enum_value);
-    return static_cast<std::underlying_type_t<Enum>>(enum_value);
-}
+VM vm;
 
 int main()
 {
@@ -39,6 +28,7 @@ int main()
     chunk.write(to_underlying(Op::return_), 123);
 
     disassembleChunk(chunk, "test chunk");
+    vm.interpret(&chunk);
 
     return 0;
 }
